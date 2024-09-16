@@ -66,9 +66,9 @@ selected_model_year = st.sidebar.multiselect('Select Model Year', unique_model_y
 # Apply filters and get the filtered DataFrame
 filtered_df = visualize_model_year_by_selected_filters(df, selected_states, selected_cafv, selected_cities, selected_make, selected_model_year)
 
-# If no data is available, display the message only once
+# If no data is available, display the updated message
 if filtered_df.empty:
-    st.write("Hey there, use the filters on the left to see insights about electric vehicles.")
+    st.write("Oooops ... looks like there is no data with that combination. Be sure a State or States are selected, as that is a requirement to use the dashboards.")
 else:
     # First visualization: Vehicle trends by make
     make_year_counts = filtered_df.groupby(['Make', 'Model Year']).size().unstack(fill_value=0)
