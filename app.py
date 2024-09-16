@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # URL of the data file
 url = 'https://data.wa.gov/api/views/f6w7-q2d2/rows.csv?accessType=DOWNLOAD'
@@ -21,16 +22,18 @@ st.markdown("""
 
 # Function to visualize the total number of vehicles by "Make"
 def visualize_vehicles_by_make(df, show_top_10=True):
-    # If default settings, show top 10
     if show_top_10:
-        make_counts = df.groupby('Make').size().nlargest(10)  # Get the top 10 makes by vehicle count
+        make_counts = df.groupby('Make').size().nlargest(10)  # Top 10 by default
+        title = "Total Number of Vehicles by Top 10 Makes"
     else:
-        make_counts = df.groupby('Make').size()  # Show all makes
+        make_counts = df.groupby('Make').size()  # Show all makes once defaults are changed
+        title = "Total Number of Vehicles by Make"
     
-    # Create a bar plot to visualize the number of vehicles by Make
+    # Create a bar plot with color coding
     fig, ax = plt.subplots(figsize=(10, 6))
-    make_counts.plot(kind='bar', ax=ax)
-    ax.set_title('Total Number of Vehicles by Make')
+    sns.barplot(x=make_counts.index, y=make_counts.values, ax=ax, palette="viridis")
+
+    ax.set_title(title)
     ax.set_xlabel('Make')
     ax.set_ylabel('Total Number of Vehicles')
     
@@ -83,26 +86,26 @@ filtered_df = df[
 
 # Determine if default settings are still selected
 default_settings = (
-    selected_states == all_states and
-    selected_cities == unique_cities and
-    selected_cafv == unique_cafv and
-    selected_make == unique_makes and
-    selected_model_year == unique_model_years
+    set(selected_states) == set(all_states) and
+    set(selected_cities) == set(unique_cities) and
+    set(selected_cafv) == set(unique_cafv) and
+    set(selected_make) == set(unique_makes) and
+    set(selected_model_year) == set(unique_model_years)
 )
 
 # If no data is available, display a message
 if filtered_df.empty:
     st.write("Oooops ... looks like there is no data with that combination. Be sure a State or States are selected, as that is a requirement to use the dashboards.")
 else:
-    # First visual: Show top 10 makes by default, or all makes if default settings are not selected
+    # First visual: Show top 10 makes by default, or all makes if default settings are modified
     visualize_vehicles_by_make(filtered_df, show_top_10=default_settings)
 
     # Second visual: Number of vehicles by state, model year, CAFV eligibility, and city
     state_year_counts = filtered_df.groupby(['State', 'Model Year']).size().unstack(fill_value=0)
 
-    # Create a stacked bar plot to visualize the number of vehicles by state and model year
+    # Create a stacked bar plot with color coding
     fig, ax = plt.subplots(figsize=(10, 5))  # Adjust the plot size for better mobile experience
-    state_year_counts.plot(kind='bar', stacked=True, ax=ax)
+    state_year_counts.plot(kind='bar', stacked=True, ax=ax, colormap="viridis")
 
     ax.set_title('Number of Vehicles by Selected States, Model Year, CAFV Eligibility, and City')
     ax.set_xlabel('State')
