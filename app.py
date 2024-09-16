@@ -2,15 +2,8 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# URL of the data file
-url = 'https://data.wa.gov/api/views/f6w7-q2d2/rows.csv?accessType=DOWNLOAD'
-
-# Load your dataset from the URL
-@st.cache_data
-def load_data():
-    return pd.read_csv(url)
-
-df = load_data()
+# Load your dataset
+df = pd.read_csv('rows.csv')
 
 # Function to visualize model year by selected states
 def visualize_model_year_by_selected_states(df, states):
