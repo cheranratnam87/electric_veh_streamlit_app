@@ -20,36 +20,6 @@ st.markdown("""
 [Website](https://cheranratnam.com/about/) | [LinkedIn](https://www.linkedin.com/in/cheranratnam/)
 """)
 
-# Add CSS and JavaScript to enhance the sidebar filter icon
-st.markdown("""
-    <style>
-        .custom-sidebar-label {
-            color: #007bff;
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .custom-sidebar-label:hover {
-            cursor: pointer;
-            color: #0056b3;
-        }
-    </style>
-    <script>
-        function showSidebar() {
-            const arrowButton = document.querySelector('.css-1rs6os.edgvbvh3');
-            if (arrowButton) {
-                arrowButton.click();
-            }
-        }
-    </script>
-""", unsafe_allow_html=True)
-
-# Display a prominent label or icon for the filter
-st.markdown("""
-    <p class="custom-sidebar-label" onclick="showSidebar()">🔍 Filters</p>
-""", unsafe_allow_html=True)
-
 # Function to visualize the total number of vehicles by "Make"
 def visualize_vehicles_by_make(df, show_top_10=True):
     if show_top_10:
