@@ -3,40 +3,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Add CSS and JavaScript for screen size detection and custom sidebar
-st.markdown("""
-    <style>
-        /* Hide the filter message by default */
-        .filter-message {
-            display: none;
-        }
+# URL of the data file
+url = 'https://data.wa.gov/api/views/f6w7-q2d2/rows.csv?accessType=DOWNLOAD'
 
-        /* Show the filter message if the screen width is below 768px (mobile) */
-        @media only screen and (max-width: 768px) {
-            .filter-message {
-                display: block;
-            }
-        }
-        
-        /* Custom styles for the filter icon or label */
-        .custom-sidebar-label {
-            color: #007bff;
-            font-weight: bold;
-        }
+# Load your dataset from the URL
+@st.cache_data
+def load_data():
+    return pd.read_csv(url)
 
-        .custom-sidebar-label:hover {
-            cursor: pointer;
-        }
-    </style>
-    <script>
-        function showSidebar() {
-            const arrowButton = document.querySelector('.css-1rs6os.edgvbvh3');
-            if (arrowButton) {
-                arrowButton.click();
-            }
-        }
-    </script>
-""", unsafe_allow_html=True)
+df = load_data()
 
 # Add a headline and tagline with hyperlinks
 st.title("Electric Vehicle Population Data")
@@ -45,12 +20,34 @@ st.markdown("""
 [Website](https://cheranratnam.com/about/) | [LinkedIn](https://www.linkedin.com/in/cheranratnam/)
 """)
 
-# Display the custom message for mobile users
+# Prompt to use the filters if the sidebar is collapsed (especially useful on mobile)
 st.markdown("""
-    <div class="filter-message">
-        <p>Hey there! Tap the <span class="custom-sidebar-label" onclick="showSidebar()">Filters</span> button to explore the data.</p>
-    </div>
-""", unsafe_allow_html=True)
+**Hey there!**  
+Don't forget to use the filters on the left to explore the data.
+If you don't see the filters, tap the **arrow button** in the top left corner to expand the sidebar!
+""")
+
+# Function to visualize the total number of vehicles by "Make"
+def visualize_vehicles_by_make(df, show_top_10=True):
+    if show_top_10:
+        make_counts = df.groupby('Make').size().nlargest(10)  # Top 10 by default
+        title = "Total Number of Vehicles by Top 10 Makes"
+    else:
+        make_counts = df.groupby('Make').size()  # Show all makes once defaults are changed
+        title = "Total Number of Vehicles by Make"
+    
+    # Create a bar plot with color coding
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.barplot(x=make_counts.index, y=make_counts.values, ax=ax, palette="viridis")
+
+    ax.set_title(title)
+    ax.set_xlabel('Make')
+    ax.set_ylabel('Total Number of Vehicles')
+    
+    # Rotate X-axis labels to avoid overlapping
+    ax.tick_params(axis='x', rotation=45, labelsize=8)
+    plt.tight_layout()
+    st.pyplot(fig)
 
 # Sidebar to select states
 all_states = df['State'].unique()
