@@ -12,6 +12,9 @@ def load_data():
 
 df = load_data()
 
+# Display column names to verify
+st.write("Available columns:", df.columns)
+
 # Function to visualize model year by selected states, CAFV eligibility, and city
 def visualize_model_year_by_selected_filters(df, states, cafv_eligibility, cities):
     # Apply filters
