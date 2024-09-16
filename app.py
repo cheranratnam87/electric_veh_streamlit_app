@@ -20,6 +20,11 @@ st.markdown("""
 [Website](https://cheranratnam.com/about/) | [LinkedIn](https://www.linkedin.com/in/cheranratnam/)
 """)
 
+# Add a message to direct users to the filters on the top left
+st.markdown("""
+### 📊 Use the filters on the **top left** to explore the data!  
+""")
+
 # Function to visualize the total number of vehicles by "Make"
 def visualize_vehicles_by_make(df, show_top_10=True):
     if show_top_10:
