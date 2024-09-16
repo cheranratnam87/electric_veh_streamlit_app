@@ -41,17 +41,20 @@ selected_states = st.sidebar.multiselect('Select states', ['Select All'] + list(
 if 'Select All' in selected_states:
     selected_states = all_states
 
+# Filter cities based on selected states
+filtered_df_for_cities = df[df['State'].isin(selected_states)]
+unique_cities = filtered_df_for_cities['City'].unique()
+
+# Sidebar to select City (all cities from selected state(s) are selected by default)
+selected_cities = st.sidebar.multiselect('Select City (optional)', ['Select All'] + list(unique_cities), default=['Select All'])
+if 'Select All' in selected_cities:
+    selected_cities = unique_cities
+
 # Sidebar to select CAFV eligibility
 unique_cafv = df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].unique()
 selected_cafv = st.sidebar.multiselect('Select CAFV Eligibility (optional)', ['Select All'] + list(unique_cafv), default=['Select All'])
 if 'Select All' in selected_cafv:
     selected_cafv = unique_cafv
-
-# Sidebar to select City
-unique_cities = df['City'].unique()
-selected_cities = st.sidebar.multiselect('Select City (optional)', ['Select All'] + list(unique_cities), default=['Select All'])
-if 'Select All' in selected_cities:
-    selected_cities = unique_cities
 
 # Sidebar to select Make
 unique_makes = df['Make'].unique()
@@ -68,8 +71,8 @@ if 'Select All' in selected_model_year:
 # Filter the DataFrame based on user selections
 filtered_df = df[
     df['State'].isin(selected_states) &
-    df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].isin(selected_cafv) &
     df['City'].isin(selected_cities) &
+    df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].isin(selected_cafv) &
     df['Make'].isin(selected_make) &
     df['Model Year'].isin(selected_model_year)
 ]
