@@ -46,7 +46,7 @@ all_states = df['State'].unique()
 selected_states = st.sidebar.multiselect('Select states', all_states, default=all_states)
 
 # Show the CAFV Eligibility filter only after state selection
-unique_cafv = df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].unique()  # Get unique values in CAFV Eligibility column
+unique_cafv = df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].unique()  # Correct column name
 selected_cafv = st.sidebar.multiselect('Select CAFV Eligibility (optional)', unique_cafv)  # No default selection
 
 # Show the City filter only after state selection
