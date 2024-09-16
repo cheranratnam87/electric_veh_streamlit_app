@@ -12,6 +12,13 @@ def load_data():
 
 df = load_data()
 
+# Add a headline and tagline with hyperlinks
+st.title("Electric Vehicle Population Data")
+st.markdown("""
+**Dashboard Created by [Cheran Ratnam](https://cheranratnam.com/about/)**  
+[Website](https://cheranratnam.com/about/) | [LinkedIn](https://www.linkedin.com/in/cheranratnam/)
+""")
+
 # Function to visualize model year by selected states, CAFV eligibility, city, make, and model year
 def visualize_model_year_by_selected_filters(df, states, cafv_eligibility, cities, make, model_year):
     # Apply filters
@@ -97,5 +104,4 @@ else:
     st.line_chart(make_year_counts.T)
 
 # Second visualization: Number of vehicles by state, model year, CAFV eligibility, and city
-st.write("Number of Vehicles by Selected States, Model Year, CAFV Eligibility, and City")
 visualize_model_year_by_selected_filters(df, selected_states, selected_cafv, selected_cities, selected_make, selected_model_year)
