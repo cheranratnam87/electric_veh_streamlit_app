@@ -19,18 +19,18 @@ st.markdown("""
 [Website](https://cheranratnam.com/about/) | [LinkedIn](https://www.linkedin.com/in/cheranratnam/)
 """)
 
-# Function to visualize the total number of vehicles by "Make"
+# Function to visualize the total number of vehicles by "Make", defaulting to the top 10
 def visualize_vehicles_by_make(df):
-    make_counts = df.groupby('Make').size()
+    make_counts = df.groupby('Make').size().nlargest(10)  # Get the top 10 makes by vehicle count
 
     # Create a bar plot to visualize the number of vehicles by Make
     fig, ax = plt.subplots(figsize=(10, 6))
     make_counts.plot(kind='bar', ax=ax)
-    ax.set_title('Total Number of Vehicles by Make')
+    ax.set_title('Total Number of Vehicles by Top 10 Makes')
     ax.set_xlabel('Make')
     ax.set_ylabel('Total Number of Vehicles')
     
-    # Rotate X-axis labels to fit more labels without crowding
+    # Rotate X-axis labels to avoid overlapping
     ax.tick_params(axis='x', rotation=45, labelsize=8)
     plt.tight_layout()
     st.pyplot(fig)
@@ -78,7 +78,7 @@ filtered_df = df[
 if filtered_df.empty:
     st.write("Oooops ... looks like there is no data with that combination. Be sure a State or States are selected, as that is a requirement to use the dashboards.")
 else:
-    # First visual: Total number of vehicles by Make (with dynamic filtering)
+    # First visual: Total number of vehicles by Make (top 10 by default)
     visualize_vehicles_by_make(filtered_df)
 
     # Second visual: Number of vehicles by state, model year, CAFV eligibility, and city
