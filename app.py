@@ -50,6 +50,28 @@ st.markdown("""
     <p class="custom-sidebar-label" onclick="showSidebar()">🔍 Filters</p>
 """, unsafe_allow_html=True)
 
+# Function to visualize the total number of vehicles by "Make"
+def visualize_vehicles_by_make(df, show_top_10=True):
+    if show_top_10:
+        make_counts = df.groupby('Make').size().nlargest(10)  # Top 10 by default
+        title = "Total Number of Vehicles by Top 10 Makes"
+    else:
+        make_counts = df.groupby('Make').size()  # Show all makes once defaults are changed
+        title = "Total Number of Vehicles by Make"
+    
+    # Create a bar plot with color coding
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.barplot(x=make_counts.index, y=make_counts.values, ax=ax, palette="viridis")
+
+    ax.set_title(title)
+    ax.set_xlabel('Make')
+    ax.set_ylabel('Total Number of Vehicles')
+    
+    # Rotate X-axis labels to avoid overlapping
+    ax.tick_params(axis='x', rotation=45, labelsize=8)
+    plt.tight_layout()
+    st.pyplot(fig)
+
 # Sidebar to select states
 all_states = df['State'].unique()
 selected_states = st.sidebar.multiselect('Select states', ['Select All'] + list(all_states), default=['Select All'])
