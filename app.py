@@ -19,17 +19,20 @@ st.markdown("""
 [Website](https://cheranratnam.com/about/) | [LinkedIn](https://www.linkedin.com/in/cheranratnam/)
 """)
 
-# Function to visualize the total number of vehicles by "Make", defaulting to the top 10
-def visualize_vehicles_by_make(df):
-    make_counts = df.groupby('Make').size().nlargest(10)  # Get the top 10 makes by vehicle count
+# Function to visualize the total number of vehicles by "Make"
+def visualize_vehicles_by_make(df, top_10=True):
+    if top_10:
+        make_counts = df.groupby('Make').size().nlargest(10)  # Show top 10 makes by default
+    else:
+        make_counts = df.groupby('Make').size()  # Show all makes when defaults are not selected
 
     # Create a bar plot to visualize the number of vehicles by Make
     fig, ax = plt.subplots(figsize=(10, 6))
     make_counts.plot(kind='bar', ax=ax)
-    ax.set_title('Total Number of Vehicles by Top 10 Makes')
+    ax.set_title('Total Number of Vehicles by Make')
     ax.set_xlabel('Make')
     ax.set_ylabel('Total Number of Vehicles')
-    
+
     # Rotate X-axis labels to avoid overlapping
     ax.tick_params(axis='x', rotation=45, labelsize=8)
     plt.tight_layout()
@@ -68,6 +71,15 @@ selected_model_year = st.sidebar.multiselect('Select Model Year', ['Select All']
 if 'Select All' in selected_model_year:
     selected_model_year = unique_model_years
 
+# Check if the default settings are still selected
+defaults_selected = (
+    selected_states == all_states and
+    selected_cities == unique_cities and
+    selected_cafv == unique_cafv and
+    selected_make == unique_makes and
+    selected_model_year == unique_model_years
+)
+
 # Filter the DataFrame based on user selections
 filtered_df = df[
     df['State'].isin(selected_states) &
@@ -81,8 +93,8 @@ filtered_df = df[
 if filtered_df.empty:
     st.write("Oooops ... looks like there is no data with that combination. Be sure a State or States are selected, as that is a requirement to use the dashboards.")
 else:
-    # First visual: Total number of vehicles by Make (top 10 by default)
-    visualize_vehicles_by_make(filtered_df)
+    # First visual: Show top 10 by default, full data if filters are changed
+    visualize_vehicles_by_make(filtered_df, top_10=defaults_selected)
 
     # Second visual: Number of vehicles by state, model year, CAFV eligibility, and city
     state_year_counts = filtered_df.groupby(['State', 'Model Year']).size().unstack(fill_value=0)
