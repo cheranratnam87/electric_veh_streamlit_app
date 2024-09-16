@@ -40,25 +40,8 @@ def visualize_model_year_by_selected_filters(df, states, cafv_eligibility, citie
     if model_year:
         filtered_df = filtered_df[filtered_df['Model Year'].isin(model_year)]
 
-    # If no data is available after filtering, display a message
-    if filtered_df.empty:
-        st.write("Hey there, use the filters on the left to see insights about electric vehicles.")
-    else:
-        # Group the data by 'State' and 'Model Year', and count the occurrences
-        state_year_counts = filtered_df.groupby(['State', 'Model Year']).size().unstack(fill_value=0)
-
-        # Create a stacked bar plot to visualize the number of vehicles by state and model year
-        fig, ax = plt.subplots(figsize=(12,7))
-        state_year_counts.plot(kind='bar', stacked=True, ax=ax)
-
-        ax.set_title('Number of Vehicles by Selected States, Model Year, CAFV Eligibility, and City')
-        ax.set_xlabel('State')
-        ax.set_ylabel('Number of Vehicles')
-        ax.tick_params(axis='x', rotation=45)
-        ax.legend(title='Model Year', bbox_to_anchor=(1.05, 1), loc='upper left')
-        plt.tight_layout()
-
-        st.pyplot(fig)  # Display the plot in Streamlit
+    # Return the filtered data
+    return filtered_df
 
 # Sidebar to select states
 all_states = df['State'].unique()
@@ -80,28 +63,31 @@ selected_make = st.sidebar.multiselect('Select Make', unique_makes, default=uniq
 unique_model_years = df['Model Year'].unique()
 selected_model_year = st.sidebar.multiselect('Select Model Year', unique_model_years, default=unique_model_years)
 
-# First visualization: Vehicle trends by make
-filtered_df = df[df['State'].isin(selected_states)]
+# Apply filters and get the filtered DataFrame
+filtered_df = visualize_model_year_by_selected_filters(df, selected_states, selected_cafv, selected_cities, selected_make, selected_model_year)
 
-if selected_cafv:
-    filtered_df = filtered_df[filtered_df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].isin(selected_cafv)]
-
-if selected_cities:
-    filtered_df = filtered_df[filtered_df['City'].isin(selected_cities)]
-
-if selected_make:
-    filtered_df = filtered_df[filtered_df['Make'].isin(selected_make)]
-
-if selected_model_year:
-    filtered_df = filtered_df[filtered_df['Model Year'].isin(selected_model_year)]
-
-# If no data is available, display a message instead of trying to plot
+# If no data is available, display the message only once
 if filtered_df.empty:
     st.write("Hey there, use the filters on the left to see insights about electric vehicles.")
 else:
+    # First visualization: Vehicle trends by make
     make_year_counts = filtered_df.groupby(['Make', 'Model Year']).size().unstack(fill_value=0)
     st.write("Vehicle Trends by Make Over the Years")
     st.line_chart(make_year_counts.T)
 
-# Second visualization: Number of vehicles by state, model year, CAFV eligibility, and city
-visualize_model_year_by_selected_filters(df, selected_states, selected_cafv, selected_cities, selected_make, selected_model_year)
+    # Second visualization: Number of vehicles by state, model year, CAFV eligibility, and city
+    st.write("Number of Vehicles by Selected States, Model Year, CAFV Eligibility, and City")
+    state_year_counts = filtered_df.groupby(['State', 'Model Year']).size().unstack(fill_value=0)
+
+    # Create a stacked bar plot to visualize the number of vehicles by state and model year
+    fig, ax = plt.subplots(figsize=(12,7))
+    state_year_counts.plot(kind='bar', stacked=True, ax=ax)
+
+    ax.set_title('Number of Vehicles by Selected States, Model Year, CAFV Eligibility, and City')
+    ax.set_xlabel('State')
+    ax.set_ylabel('Number of Vehicles')
+    ax.tick_params(axis='x', rotation=45)
+    ax.legend(title='Model Year', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+
+    st.pyplot(fig)  # Display the plot in Streamlit
