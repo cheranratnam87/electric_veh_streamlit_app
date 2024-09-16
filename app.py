@@ -12,11 +12,8 @@ def load_data():
 
 df = load_data()
 
-# Display column names to verify
-st.write("Available columns:", df.columns)
-
-# Function to visualize model year by selected states, CAFV eligibility, and city
-def visualize_model_year_by_selected_filters(df, states, cafv_eligibility, cities):
+# Function to visualize model year by selected states, CAFV eligibility, city, make, and model year
+def visualize_model_year_by_selected_filters(df, states, cafv_eligibility, cities, make, model_year):
     # Apply filters
     filtered_df = df[df['State'].isin(states)]
     
@@ -27,6 +24,14 @@ def visualize_model_year_by_selected_filters(df, states, cafv_eligibility, citie
     # Further filter by City if selected
     if cities:
         filtered_df = filtered_df[filtered_df['City'].isin(cities)]
+    
+    # Further filter by Make if selected
+    if make:
+        filtered_df = filtered_df[filtered_df['Make'].isin(make)]
+    
+    # Further filter by Model Year if selected
+    if model_year:
+        filtered_df = filtered_df[filtered_df['Model Year'].isin(model_year)]
 
     # Group the data by 'State' and 'Model Year', and count the occurrences
     state_year_counts = filtered_df.groupby(['State', 'Model Year']).size().unstack(fill_value=0)
@@ -49,12 +54,20 @@ all_states = df['State'].unique()
 selected_states = st.sidebar.multiselect('Select states', all_states, default=all_states)
 
 # Show the CAFV Eligibility filter only after state selection
-unique_cafv = df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].unique()  # Correct column name
+unique_cafv = df['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].unique()
 selected_cafv = st.sidebar.multiselect('Select CAFV Eligibility (optional)', unique_cafv)  # No default selection
 
 # Show the City filter only after state selection
-unique_cities = df[df['State'].isin(selected_states)]['City'].unique()  # Get cities from the selected states
+unique_cities = df[df['State'].isin(selected_states)]['City'].unique()
 selected_cities = st.sidebar.multiselect('Select City (optional)', unique_cities)  # No default selection
+
+# Add Make filter
+unique_makes = df['Make'].unique()
+selected_make = st.sidebar.multiselect('Select Make', unique_makes, default=unique_makes)
+
+# Add Model Year filter
+unique_model_years = df['Model Year'].unique()
+selected_model_year = st.sidebar.multiselect('Select Model Year', unique_model_years, default=unique_model_years)
 
 # First visualization: Vehicle trends by make
 filtered_df = df[df['State'].isin(selected_states)]
@@ -65,10 +78,16 @@ if selected_cafv:
 if selected_cities:
     filtered_df = filtered_df[filtered_df['City'].isin(selected_cities)]
 
+if selected_make:
+    filtered_df = filtered_df[filtered_df['Make'].isin(selected_make)]
+
+if selected_model_year:
+    filtered_df = filtered_df[filtered_df['Model Year'].isin(selected_model_year)]
+
 make_year_counts = filtered_df.groupby(['Make', 'Model Year']).size().unstack(fill_value=0)
 st.write("Vehicle Trends by Make Over the Years")
 st.line_chart(make_year_counts.T)
 
 # Second visualization: Number of vehicles by state, model year, CAFV eligibility, and city
 st.write("Number of Vehicles by Selected States, Model Year, CAFV Eligibility, and City")
-visualize_model_year_by_selected_filters(df, selected_states, selected_cafv, selected_cities)
+visualize_model_year_by_selected_filters(df, selected_states, selected_cafv, selected_cities, selected_make, selected_model_year)
